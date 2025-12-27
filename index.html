@@ -114,6 +114,9 @@ h1 {
   background: radial-gradient(circle, var(--gold), var(--purple));
   box-shadow: 0 10px 25px rgba(0,0,0,0.6);
   transition: transform 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #pray-btn:active {
@@ -122,6 +125,10 @@ h1 {
 
 #pray-btn .emoji {
   display: inline-flex;
+  white-space: nowrap;
+  gap: 4px;
+}
+
   gap: 4px;
   align-items: center;
   justify-content: center;
@@ -176,7 +183,7 @@ h1 {
 <!-- 😭🙏 button -->
 <div id="pray-container">
   <button id="pray-btn">
-    <span class="emoji">😭 🙏</span>
+    <span class="emoji">😭🙏</span>
   </button>
   <div id="pray-count"></div>
 </div>
@@ -204,7 +211,7 @@ document.addEventListener("keydown", e => {
   if (!e.ctrlKey || !e.shiftKey) return;
 
   if (e.key === "+") wins = Math.min(wins + 1, total);
-  if (e.key === "-") wins = Math.max(wins - 1, 0);
+  if (e.key === "_") wins = Math.max(wins - 1, 0);
 
   localStorage.setItem("egotyWins", wins);
   renderProgress();
