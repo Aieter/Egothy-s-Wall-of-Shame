@@ -188,77 +188,76 @@ h1 {
 </div>
 
 <script>
-const API = "/.netlify/functions/counters";
-const total = 20;
-
 /* ===== Audio ===== */
 const clickSound = new Audio("click.mp3");
 clickSound.volume = 0.5;
+
+/* ===== Config ===== */
+const total = 20;
+const API = "/.netlify/functions/counters";
 
 /* ===== State ===== */
 let wins = 0;
 let prayers = 0;
 
+/* ===== Elements ===== */
+const fill = document.getElementById("fill");
+const label = document.getElementById("label");
+const prayCount = document.getElementById("pray-count");
+const prayBtn = document.getElementById("pray-btn");
+
 /* ===== Render ===== */
-function renderProgress() {
-  document.getElementById("fill").style.width =
-    (wins / total) * 100 + "%";
-  document.getElementById("label").textContent =
-    `${wins} / ${total} wins`;
+function render() {
+  fill.style.width = `${(wins / total) * 100}%`;
+  label.textContent = `${wins} / ${total} wins`;
+  prayCount.textContent = `${prayers} prayers sent`;
 }
 
-function updatePrayerCount() {
-  document.getElementById("pray-count").textContent =
-    `${prayers} prayers sent`;
-}
-
-/* ===== Sync from backend (live) ===== */
-async function syncCounters() {
+/* ===== Fetch from server ===== */
+async function fetchCounters() {
   const res = await fetch(API);
   const data = await res.json();
 
   wins = data.wins;
   prayers = data.prayers;
-
-  renderProgress();
-  updatePrayerCount();
+  render();
 }
 
-setInterval(syncCounters, 2000);
-syncCounters();
+/* ===== Mutations ===== */
+async function sendAction(action) {
+  await fetch(`${API}?action=${action}`, { method: "POST" });
+  await fetchCounters();
+}
 
 /* ===== Admin shortcuts ===== */
-document.addEventListener("keydown", async e => {
+document.addEventListener("keydown", e => {
   if (!e.ctrlKey || !e.shiftKey) return;
 
-  if (e.code === "Equal") {
-    await fetch(`${API}?action=win`, { method: "POST" });
-  }
-
-  if (e.code === "Minus") {
-    await fetch(`${API}?action=unwin`, { method: "POST" });
-  }
+  if (e.key === "+") sendAction("win");
+  if (e.key === "_") sendAction("unwin");
 });
 
 /* ===== 😭🙏 Button ===== */
-document.getElementById("pray-btn").addEventListener("click", async e => {
+const phrases = [
+  "wallahi bro is cooked",
+  "yeah he ain't never getting this",
+  "wrap it up",
+  "this is not looking good",
+  "generational choke",
+  "prayers required immediately",
+  "it's joever",
+  "start the apology tour"
+];
+
+prayBtn.addEventListener("click", async e => {
   clickSound.currentTime = 0;
   clickSound.play();
 
-  await fetch(`${API}?action=pray`, { method: "POST" });
+  await sendAction("pray");
 
   const text = document.createElement("div");
   text.className = "floating-text";
-  text.textContent = [
-    "wallahi bro is cooked",
-    "yeah he ain't never getting this",
-    "wrap it up",
-    "this is not looking good",
-    "generational choke",
-    "prayers required immediately",
-    "it's joever",
-    "start the apology tour"
-  ][Math.floor(Math.random() * 8)];
+  text.textContent = phrases[Math.floor(Math.random() * phrases.length)];
 
   text.style.left = `${e.clientX - 20}px`;
   text.style.top = `${e.clientY - 40}px`;
@@ -266,7 +265,12 @@ document.getElementById("pray-btn").addEventListener("click", async e => {
   document.body.appendChild(text);
   setTimeout(() => text.remove(), 1200);
 });
+
+/* ===== Initial load + live updates ===== */
+fetchCounters();
+setInterval(fetchCounters, 3000);
 </script>
+
 
 </body>
 </html>
