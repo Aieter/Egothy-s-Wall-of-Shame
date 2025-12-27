@@ -1,4 +1,4 @@
-import { neon } from "@netlify/neon";
+const { neon } = require("@netlify/neon");
 
 const sql = neon();
 
@@ -21,7 +21,7 @@ async function ensureSetup() {
   }
 }
 
-export async function handler(event) {
+exports.handler = async function (event) {
   await ensureSetup();
 
   if (event.httpMethod === "POST") {
@@ -56,4 +56,4 @@ export async function handler(event) {
     },
     body: JSON.stringify(row)
   };
-}
+};
