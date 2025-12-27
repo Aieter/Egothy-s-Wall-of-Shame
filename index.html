@@ -188,9 +188,26 @@ h1 {
 </div>
 
 <script>
-/* ===== Audio ===== */
-const clickSound = new Audio("click.mp3");
-clickSound.volume = 0.5;
+/* ===== Click Sounds ===== */
+const clickSounds = [
+  new Audio("click1.mp3"),
+  new Audio("click2.mp3"),
+  new Audio("click3.mp3"),
+  new Audio("click4.mp3"),
+  new Audio("click5.mp3")
+];
+
+clickSounds.forEach(s => s.volume = 0.5);
+
+let soundIndex = 0;
+
+function playClick() {
+  const sound = clickSounds[soundIndex];
+  sound.currentTime = 0;
+  sound.play();
+
+  soundIndex = (soundIndex + 1) % clickSounds.length;
+}
 
 /* ===== Config ===== */
 const total = 20;
