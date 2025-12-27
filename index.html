@@ -277,7 +277,6 @@ const clickSounds = [
   new Audio("click3.mp3"),
   new Audio("click4.mp3"),
 ];
-
 clickSounds.forEach(s => s.volume = 0.5);
 
 let soundIndex = 0;
@@ -291,10 +290,13 @@ function playClick() {
 /* ===== Config ===== */
 const total = 20;
 const API = "/.netlify/functions/counters";
+const PRAY_FLUSH_DELAY = 3000;
 
 /* ===== State ===== */
 let wins = 0;
 let prayers = 0;
+let pendingPrayers = 0;
+let prayFlushTimer = null;
 
 /* ===== Elements ===== */
 const fill = document.getElementById("fill");
@@ -313,21 +315,35 @@ function render() {
 async function fetchCounters() {
   const res = await fetch(API);
   const data = await res.json();
+
   wins = data.wins;
   prayers = data.prayers;
   render();
 }
 
-/* ===== Mutations ===== */
-async function sendAction(action) {
-  fetch(`${API}?action=${action}`, { method: "POST" });
+/* ===== Batched flush ===== */
+async function flushPrayers() {
+  if (pendingPrayers === 0) return;
+
+  const amount = pendingPrayers;
+  pendingPrayers = 0;
+
+  try {
+    await fetch(`${API}?action=pray&amount=${amount}`, {
+      method: "POST"
+    });
+    await fetchCounters(); // resync authoritative state
+  } catch (err) {
+    console.error("Failed to flush prayers", err);
+    pendingPrayers += amount; // safety rollback
+  }
 }
 
 /* ===== Admin Shortcuts ===== */
 document.addEventListener("keydown", e => {
   if (!e.ctrlKey || !e.shiftKey) return;
-  if (e.key === "+") sendAction("win");
-  if (e.key === "_") sendAction("unwin");
+  if (e.key === "+") fetch(`${API}?action=win`, { method: "POST" });
+  if (e.key === "_") fetch(`${API}?action=unwin`, { method: "POST" });
 });
 
 /* ===== 😭🙏 Button ===== */
@@ -345,6 +361,12 @@ const phrases = [
 prayBtn.addEventListener("click", e => {
   playClick();
 
+  /* === Immediate UI update === */
+  prayers++;
+  pendingPrayers++;
+  render();
+
+  /* === Floating text (instant) === */
   const text = document.createElement("div");
   text.className = "floating-text";
   text.textContent =
@@ -356,7 +378,9 @@ prayBtn.addEventListener("click", e => {
   document.body.appendChild(text);
   setTimeout(() => text.remove(), 1200);
 
-  sendAction("pray");
+  /* === Debounce backend sync === */
+  if (prayFlushTimer) clearTimeout(prayFlushTimer);
+  prayFlushTimer = setTimeout(flushPrayers, PRAY_FLUSH_DELAY);
 });
 
 /* ===== Init ===== */
