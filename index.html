@@ -100,23 +100,26 @@ h1 {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   z-index: 999;
 }
 
 #pray-btn {
-  width: 64px;
-  height: 64px;
+  width: 74px;
+  height: 74px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  font-size: 26px;
   background: radial-gradient(circle, var(--gold), var(--purple));
   box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-  transition: transform 0.15s ease;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  transition: transform 0.15s ease;
 }
 
 #pray-btn:active {
@@ -124,14 +127,10 @@ h1 {
 }
 
 #pray-btn .emoji {
-  display: inline-flex;
-  white-space: nowrap;
-  gap: 4px;
-}
-
-  gap: 4px;
-  align-items: center;
-  justify-content: center;
+  display: flex;
+  gap: 6px;
+  font-size: 28px;
+  line-height: 1;
 }
 
 #pray-count {
@@ -189,14 +188,18 @@ h1 {
 </div>
 
 <script>
+const API = "/.netlify/functions/counters";
+const total = 20;
+
 /* ===== Audio ===== */
 const clickSound = new Audio("click.mp3");
 clickSound.volume = 0.5;
 
-/* ===== Progress Logic ===== */
-const total = 20;
-let wins = Number(localStorage.getItem("egotyWins")) || 0;
+/* ===== State ===== */
+let wins = 0;
+let prayers = 0;
 
+/* ===== Render ===== */
 function renderProgress() {
   document.getElementById("fill").style.width =
     (wins / total) * 100 + "%";
@@ -204,58 +207,58 @@ function renderProgress() {
     `${wins} / ${total} wins`;
 }
 
-renderProgress();
-
-// Admin shortcuts
-document.addEventListener("keydown", e => {
-  if (!e.ctrlKey || !e.shiftKey) return;
-
-  if (e.key === "+") wins = Math.min(wins + 1, total);
-  if (e.key === "_") wins = Math.max(wins - 1, 0);
-
-  localStorage.setItem("egotyWins", wins);
-  renderProgress();
-});
-
-/* ===== 😭🙏 Button Logic ===== */
-const prayBtn = document.getElementById("pray-btn");
-const prayCount = document.getElementById("pray-count");
-
-const phrases = [
-  "wallahi bro is cooked",
-  "yeah he ain't never getting this",
-  "wrap it up",
-  "this is not looking good",
-  "generational choke",
-  "prayers required immediately",
-  "it's joever",
-  "start the apology tour"
-];
-
-let prayers =
-  Number(localStorage.getItem("prayerCount")) || 0;
-
 function updatePrayerCount() {
-  prayCount.textContent = `${prayers} prayers sent`;
+  document.getElementById("pray-count").textContent =
+    `${prayers} prayers sent`;
 }
 
-updatePrayerCount();
+/* ===== Sync from backend (live) ===== */
+async function syncCounters() {
+  const res = await fetch(API);
+  const data = await res.json();
 
-prayBtn.addEventListener("click", e => {
-  // Sound
+  wins = data.wins;
+  prayers = data.prayers;
+
+  renderProgress();
+  updatePrayerCount();
+}
+
+setInterval(syncCounters, 2000);
+syncCounters();
+
+/* ===== Admin shortcuts ===== */
+document.addEventListener("keydown", async e => {
+  if (!e.ctrlKey || !e.shiftKey) return;
+
+  if (e.code === "Equal") {
+    await fetch(`${API}?action=win`, { method: "POST" });
+  }
+
+  if (e.code === "Minus") {
+    await fetch(`${API}?action=unwin`, { method: "POST" });
+  }
+});
+
+/* ===== 😭🙏 Button ===== */
+document.getElementById("pray-btn").addEventListener("click", async e => {
   clickSound.currentTime = 0;
   clickSound.play();
 
-  // Increment
-  prayers++;
-  localStorage.setItem("prayerCount", prayers);
-  updatePrayerCount();
+  await fetch(`${API}?action=pray`, { method: "POST" });
 
-  // Floating text
   const text = document.createElement("div");
   text.className = "floating-text";
-  text.textContent =
-    phrases[Math.floor(Math.random() * phrases.length)];
+  text.textContent = [
+    "wallahi bro is cooked",
+    "yeah he ain't never getting this",
+    "wrap it up",
+    "this is not looking good",
+    "generational choke",
+    "prayers required immediately",
+    "it's joever",
+    "start the apology tour"
+  ][Math.floor(Math.random() * 8)];
 
   text.style.left = `${e.clientX - 20}px`;
   text.style.top = `${e.clientY - 40}px`;
