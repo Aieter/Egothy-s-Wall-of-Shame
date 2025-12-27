@@ -10,9 +10,9 @@
   --bg2: #0b0f2a;
   --purple: #6d5dfc;
   --gold: #f5c77a;
-  --glass: rgba(255, 255, 255, 0.08);
 }
 
+/* Reset */
 * {
   box-sizing: border-box;
 }
@@ -28,6 +28,7 @@ body {
   justify-content: center;
 }
 
+/* Card */
 .card {
   width: 90%;
   max-width: 600px;
@@ -45,9 +46,11 @@ body {
   text-align: center;
 }
 
+/* Text */
 h1 {
   margin: 0 0 10px;
   font-size: 2.2rem;
+  letter-spacing: 0.04em;
   background: linear-gradient(90deg, var(--gold), var(--purple));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -55,12 +58,14 @@ h1 {
 
 .subtitle {
   opacity: 0.85;
-  margin-bottom: 30px;
+  margin-bottom: 28px;
 }
 
+/* Progress bar */
 .progress {
   height: 26px;
   width: 100%;
+  margin: 18px 0 10px;
   background: rgba(0,0,0,0.4);
   border-radius: 999px;
   overflow: hidden;
@@ -70,30 +75,91 @@ h1 {
 .fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(
-    90deg,
-    var(--purple),
-    var(--gold)
-  );
+  background: linear-gradient(90deg, var(--purple), var(--gold));
   box-shadow:
-    0 0 15px rgba(245,199,122,0.8);
-  transition: width 0.6s ease;
+    0 0 25px rgba(245,199,122,0.6),
+    inset 0 0 10px rgba(0,0,0,0.4);
+  transition: width 0.6s cubic-bezier(.22,.61,.36,1);
 }
 
 .label {
-  margin-top: 12px;
+  margin-top: 14px;
   font-size: 1.1rem;
+  opacity: 0.9;
 }
 
 .admin {
-  margin-top: 25px;
-  opacity: 0.25;
+  margin-top: 28px;
+  opacity: 0.18;
   font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* 😭🙏 Button */
+#pray-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  text-align: center;
+  z-index: 999;
+}
+
+#pray-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 26px;
+  background: radial-gradient(circle, var(--gold), var(--purple));
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+  transition: transform 0.15s ease;
+}
+
+#pray-btn:active {
+  transform: scale(1.2) rotate(-12deg);
+}
+
+#pray-btn .emoji {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+#pray-count {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+/* Floating phrase */
+.floating-text {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--gold);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  animation: floatUp 1.2s ease forwards;
+}
+
+@keyframes floatUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
 }
 </style>
 </head>
 
 <body>
+
 <div class="card">
   <h1>Egoty’s Wall of Shame</h1>
   <div class="subtitle">Premier wins promised: <strong>20</strong></div>
@@ -103,40 +169,94 @@ h1 {
   </div>
 
   <div class="label" id="label"></div>
+
+  <div class="admin">don’t do the crime if you can’t do the time</div>
+</div>
+
+<!-- 😭🙏 button -->
+<div id="pray-container">
+  <button id="pray-btn">
+    <span class="emoji">😭 🙏</span>
+  </button>
+  <div id="pray-count"></div>
 </div>
 
 <script>
-const total = 20;
+/* ===== Audio ===== */
+const clickSound = new Audio("click.mp3");
+clickSound.volume = 0.5;
 
-// Persistent storage
+/* ===== Progress Logic ===== */
+const total = 20;
 let wins = Number(localStorage.getItem("egotyWins")) || 0;
 
-function render() {
+function renderProgress() {
   document.getElementById("fill").style.width =
     (wins / total) * 100 + "%";
   document.getElementById("label").textContent =
     `${wins} / ${total} wins`;
 }
 
-render();
+renderProgress();
 
+// Admin shortcuts
 document.addEventListener("keydown", e => {
   if (!e.ctrlKey || !e.shiftKey) return;
 
-  // Add a win
-  if (e.key === "+") {
-    wins = Math.min(wins + 1, total);
-  }
-
-  // Remove a win
-  if (e.key === "-") {
-    wins = Math.max(wins - 1, 0);
-  }
+  if (e.key === "+") wins = Math.min(wins + 1, total);
+  if (e.key === "-") wins = Math.max(wins - 1, 0);
 
   localStorage.setItem("egotyWins", wins);
-  render();
+  renderProgress();
 });
 
+/* ===== 😭🙏 Button Logic ===== */
+const prayBtn = document.getElementById("pray-btn");
+const prayCount = document.getElementById("pray-count");
+
+const phrases = [
+  "wallahi bro is cooked",
+  "yeah he ain't never getting this",
+  "wrap it up",
+  "this is not looking good",
+  "generational choke",
+  "prayers required immediately",
+  "it's joever",
+  "start the apology tour"
+];
+
+let prayers =
+  Number(localStorage.getItem("prayerCount")) || 0;
+
+function updatePrayerCount() {
+  prayCount.textContent = `${prayers} prayers sent`;
+}
+
+updatePrayerCount();
+
+prayBtn.addEventListener("click", e => {
+  // Sound
+  clickSound.currentTime = 0;
+  clickSound.play();
+
+  // Increment
+  prayers++;
+  localStorage.setItem("prayerCount", prayers);
+  updatePrayerCount();
+
+  // Floating text
+  const text = document.createElement("div");
+  text.className = "floating-text";
+  text.textContent =
+    phrases[Math.floor(Math.random() * phrases.length)];
+
+  text.style.left = `${e.clientX - 20}px`;
+  text.style.top = `${e.clientY - 40}px`;
+
+  document.body.appendChild(text);
+  setTimeout(() => text.remove(), 1200);
+});
 </script>
+
 </body>
 </html>
