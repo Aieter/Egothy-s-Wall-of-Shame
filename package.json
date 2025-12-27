@@ -1,0 +1,8 @@
+{
+  "name": "egotys-wall-of-shame",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@netlify/neon": "^1.0.0"
+  }
+}
