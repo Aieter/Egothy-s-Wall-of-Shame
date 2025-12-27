@@ -267,10 +267,8 @@ const phrases = [
 ];
 
 prayBtn.addEventListener("click", e => {
-  // Sound
-  clickSound.currentTime = 0;
-  clickSound.play();
-
+  playClick();
+  
   // Floating text (IMMEDIATE)
   const text = document.createElement("div");
   text.className = "floating-text";
