@@ -2,15 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
 <link rel="icon" type="image/png" href="/favicon.png">
 <title>Egoty’s Wall of Shame</title>
 
 <style>
-  html, body {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
+/* ===== Root ===== */
 :root {
   --bg1: #050814;
   --bg2: #0b0f2a;
@@ -18,25 +16,42 @@
   --gold: #f5c77a;
 }
 
-/* Reset */
+/* ===== Global Reset ===== */
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* removes blue tap flash */
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ===== Body ===== */
 body {
   overscroll-behavior: none;
   touch-action: manipulation;
   margin: 0;
-  height: 100vh;
+  min-height: 100dvh;
+
   background: radial-gradient(circle at top, var(--bg2), var(--bg1));
   font-family: "Segoe UI", system-ui, sans-serif;
   color: #eaeaf0;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  /* iOS safe areas */
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
 }
 
-/* Card */
+/* ===== Card ===== */
 .card {
   width: 90%;
   max-width: 600px;
@@ -54,7 +69,7 @@ body {
   text-align: center;
 }
 
-/* Text */
+/* ===== Text ===== */
 h1 {
   margin: 0 0 10px;
   font-size: 2.2rem;
@@ -69,7 +84,7 @@ h1 {
   margin-bottom: 28px;
 }
 
-/* Progress bar */
+/* ===== Progress Bar ===== */
 .progress {
   height: 26px;
   width: 100%;
@@ -103,7 +118,7 @@ h1 {
   font-style: italic;
 }
 
-/* 😭🙏 Button */
+/* ===== 😭🙏 Button ===== */
 #pray-container {
   position: fixed;
   bottom: 24px;
@@ -120,6 +135,7 @@ h1 {
   border-radius: 50%;
   border: none;
   cursor: pointer;
+
   background: radial-gradient(circle, var(--gold), var(--purple));
   box-shadow: 0 10px 25px rgba(0,0,0,0.6);
 
@@ -128,6 +144,16 @@ h1 {
   justify-content: center;
 
   transition: transform 0.15s ease;
+
+  /* 👇 prevent selection / focus outlines */
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+}
+
+#pray-btn:focus,
+#pray-btn:active {
+  outline: none;
 }
 
 #pray-btn:active {
@@ -139,6 +165,7 @@ h1 {
   gap: 6px;
   font-size: 28px;
   line-height: 1;
+  pointer-events: none;
 }
 
 #pray-count {
@@ -147,7 +174,7 @@ h1 {
   opacity: 0.6;
 }
 
-/* Floating phrase */
+/* ===== Floating Phrase ===== */
 .floating-text {
   position: fixed;
   pointer-events: none;
@@ -169,6 +196,54 @@ h1 {
     transform: translateY(-40px);
   }
 }
+
+/* ===== Mobile ===== */
+@media (max-width: 600px) {
+  .card {
+    max-width: 92vw;
+    padding: 28px;
+    border-radius: 16px;
+    transform: scale(1.05);
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .label {
+    font-size: 1rem;
+  }
+
+  #pray-container {
+    bottom: 20px;
+    right: 20px;
+  }
+
+  #pray-btn {
+    width: 78px;
+    height: 78px;
+  }
+
+  #pray-count {
+    font-size: 0.8rem;
+  }
+}
+
+/* ===== Tablets ===== */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .card {
+    max-width: 520px;
+    padding: 36px;
+  }
+
+  h1 {
+    font-size: 1.9rem;
+  }
+}
 </style>
 </head>
 
@@ -183,11 +258,10 @@ h1 {
   </div>
 
   <div class="label" id="label"></div>
-
   <div class="admin">don’t do the crime if you can’t do the time</div>
 </div>
 
-<!-- 😭🙏 button -->
+<!-- 😭🙏 Button -->
 <div id="pray-container">
   <button id="pray-btn">
     <span class="emoji">😭🙏</span>
@@ -207,12 +281,10 @@ const clickSounds = [
 clickSounds.forEach(s => s.volume = 0.5);
 
 let soundIndex = 0;
-
 function playClick() {
   const sound = clickSounds[soundIndex];
   sound.currentTime = 0;
   sound.play();
-
   soundIndex = (soundIndex + 1) % clickSounds.length;
 }
 
@@ -237,11 +309,10 @@ function render() {
   prayCount.textContent = `${prayers} prayers sent`;
 }
 
-/* ===== Fetch from server ===== */
+/* ===== Fetch ===== */
 async function fetchCounters() {
   const res = await fetch(API);
   const data = await res.json();
-
   wins = data.wins;
   prayers = data.prayers;
   render();
@@ -249,14 +320,12 @@ async function fetchCounters() {
 
 /* ===== Mutations ===== */
 async function sendAction(action) {
-  await fetch(`${API}?action=${action}`, { method: "POST" });
-  await fetchCounters();
+  fetch(`${API}?action=${action}`, { method: "POST" });
 }
 
-/* ===== Admin shortcuts ===== */
+/* ===== Admin Shortcuts ===== */
 document.addEventListener("keydown", e => {
   if (!e.ctrlKey || !e.shiftKey) return;
-
   if (e.key === "+") sendAction("win");
   if (e.key === "_") sendAction("unwin");
 });
@@ -275,8 +344,7 @@ const phrases = [
 
 prayBtn.addEventListener("click", e => {
   playClick();
-  
-  // Floating text (IMMEDIATE)
+
   const text = document.createElement("div");
   text.className = "floating-text";
   text.textContent =
@@ -288,16 +356,13 @@ prayBtn.addEventListener("click", e => {
   document.body.appendChild(text);
   setTimeout(() => text.remove(), 1200);
 
-  // Backend update (async, non-blocking)
   sendAction("pray");
 });
 
-
-/* ===== Initial load + live updates ===== */
+/* ===== Init ===== */
 fetchCounters();
 setInterval(fetchCounters, 3000);
 </script>
-
 
 </body>
 </html>
