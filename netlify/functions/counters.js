@@ -1,1 +1,59 @@
+import { neon } from "@netlify/neon";
 
+const sql = neon();
+
+async function ensureSetup() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS counters (
+      id INTEGER PRIMARY KEY,
+      wins INTEGER NOT NULL,
+      prayers INTEGER NOT NULL
+    )
+  `;
+
+  const rows = await sql`SELECT id FROM counters WHERE id = 1`;
+
+  if (rows.length === 0) {
+    await sql`
+      INSERT INTO counters (id, wins, prayers)
+      VALUES (1, 0, 0)
+    `;
+  }
+}
+
+export async function handler(event) {
+  await ensureSetup();
+
+  if (event.httpMethod === "POST") {
+    const action = event.queryStringParameters?.action;
+
+    if (action === "pray") {
+      await sql`UPDATE counters SET prayers = prayers + 1 WHERE id = 1`;
+    }
+
+    if (action === "win") {
+      await sql`UPDATE counters SET wins = wins + 1 WHERE id = 1`;
+    }
+
+    if (action === "unwin") {
+      await sql`
+        UPDATE counters
+        SET wins = GREATEST(wins - 1, 0)
+        WHERE id = 1
+      `;
+    }
+  }
+
+  const [row] = await sql`
+    SELECT wins, prayers FROM counters WHERE id = 1
+  `;
+
+  return {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    },
+    body: JSON.stringify(row)
+  };
+}
