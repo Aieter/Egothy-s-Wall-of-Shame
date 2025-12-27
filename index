@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Egoty’s Wall of Shame</title>
+
+<style>
+:root {
+  --bg1: #050814;
+  --bg2: #0b0f2a;
+  --purple: #6d5dfc;
+  --gold: #f5c77a;
+  --glass: rgba(255, 255, 255, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle at top, var(--bg2), var(--bg1));
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: #eaeaf0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  width: 90%;
+  max-width: 600px;
+  padding: 40px;
+  border-radius: 20px;
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,0.10),
+    rgba(255,255,255,0.03)
+  );
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 0 40px rgba(109, 93, 252, 0.25),
+    inset 0 0 0 1px rgba(255,255,255,0.1);
+  text-align: center;
+}
+
+h1 {
+  margin: 0 0 10px;
+  font-size: 2.2rem;
+  background: linear-gradient(90deg, var(--gold), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  opacity: 0.85;
+  margin-bottom: 30px;
+}
+
+.progress {
+  height: 26px;
+  width: 100%;
+  background: rgba(0,0,0,0.4);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.8);
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(
+    90deg,
+    var(--purple),
+    var(--gold)
+  );
+  box-shadow:
+    0 0 15px rgba(245,199,122,0.8);
+  transition: width 0.6s ease;
+}
+
+.label {
+  margin-top: 12px;
+  font-size: 1.1rem;
+}
+
+.admin {
+  margin-top: 25px;
+  opacity: 0.25;
+  font-size: 0.8rem;
+}
+</style>
+</head>
+
+<body>
+<div class="card">
+  <h1>Egoty’s Wall of Shame</h1>
+  <div class="subtitle">Premier wins promised: <strong>20</strong></div>
+
+  <div class="progress">
+    <div class="fill" id="fill"></div>
+  </div>
+
+  <div class="label" id="label"></div>
+
+  <div class="admin">(admin-controlled)</div>
+</div>
+
+<script>
+const total = 20;
+
+// Persistent storage
+let wins = Number(localStorage.getItem("egotyWins")) || 0;
+
+function render() {
+  document.getElementById("fill").style.width =
+    (wins / total) * 100 + "%";
+  document.getElementById("label").textContent =
+    `${wins} / ${total} wins`;
+}
+
+render();
+
+document.addEventListener("keydown", e => {
+  if (!e.ctrlKey || !e.shiftKey) return;
+
+  // Add a win
+  if (e.key === "+") {
+    wins = Math.min(wins + 1, total);
+  }
+
+  // Remove a win
+  if (e.key === "-") {
+    wins = Math.max(wins - 1, 0);
+  }
+
+  localStorage.setItem("egotyWins", wins);
+  render();
+});
+
+</script>
+</body>
+</html>
