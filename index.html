@@ -641,6 +641,7 @@ function updateExchangeUI(startRate, today, yesterday) {
 
 /* ===== Render ===== */
 function render() {
+  console.log('Rendering with wins:', wins, 'total:', total);
   fill.style.width = `${(wins / total) * 100}%`;
   label.textContent = `${wins} / ${total} wins`;
   prayCount.textContent = `${prayers} prayers sent`;
@@ -650,12 +651,16 @@ function render() {
 /* ===== Fetch ===== */
 async function fetchCounters() {
   try {
+    console.log('Fetching counters from:', API);
     const res = await fetch(API);
+    console.log('Response status:', res.status);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
+    console.log('Received data:', data);
     wins = data.wins ?? wins;
     prayers = data.prayers ?? prayers;
     hagels = data.hagels ?? data.hagelslags ?? hagels;
+    console.log('Updated values - wins:', wins, 'prayers:', prayers, 'hagels:', hagels);
     render();
   } catch (err) {
     console.warn("fetchCounters failed:", err);
@@ -720,15 +725,20 @@ hagelBtn.addEventListener("click", e => {
 });
 
 /* ===== Init ===== */
+console.log('Initializing...');
 render(); // Initial render with default values
+console.log('Initial render complete, fetching counters...');
 fetchCounters();
 setInterval(fetchCounters, 3000);
 
 /* ===== Exchange tracker ===== */
 async function fetchExchange() {
   try {
+    console.log('Fetching exchange from:', EXCHANGE_API);
     const res = await fetch(EXCHANGE_API);
+    console.log('Exchange response status:', res.status);
     const data = await res.json();
+    console.log('Exchange data:', data);
     const startRate = data.startRate ?? 42.51;
     let today = data.currentRate ?? null;
     const yesterday = data.yesterdayRate ?? null;
