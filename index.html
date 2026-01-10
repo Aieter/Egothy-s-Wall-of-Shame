@@ -445,6 +445,108 @@ h1 {
   #left-counters { bottom: 18px; left: 18px; }
   .left-counter .born-num, .left-counter .matey-num { font-size: 1.05rem; }
 }
+/* ===== One-and-done mobile layout fix ===== */
+@media (max-width: 600px) {
+  /* Allow vertical scrolling on phones */
+  html, body { overflow: auto; }
+
+  /* Use a simple 2-col grid layout */
+  body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto auto; /* exchange, card, tomb+buttons, left-counters */
+    gap: 14px;
+    align-content: start;
+    justify-items: center;
+
+    padding: 14px;
+    padding-top: calc(env(safe-area-inset-top) + 14px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 14px);
+
+    /* override any previous flex-centering */
+    justify-content: initial;
+    align-items: initial;
+    flex-direction: initial;
+  }
+
+  /* Exchange tracker: full width */
+  #exchange-tracker {
+    position: static !important;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: min(94vw, 560px);
+    min-width: 0;
+    margin: 0;
+  }
+
+  /* Main card: full width */
+  .card {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: min(94vw, 560px);
+    margin: 0;
+    transform: none !important; /* prevents mobile squeeze */
+  }
+
+  /* Tombstone: LEFT, same row as buttons */
+  #shrimp-tombstone {
+    position: static !important;
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: start;
+    align-self: center;
+
+    width: 100%;
+    max-width: 240px;
+    margin: 0;
+  }
+
+  /* Prayer + Hagelslag cluster: RIGHT, same row as tombstone */
+  #pray-container {
+    position: static !important;
+    grid-column: 2;
+    grid-row: 3;
+    justify-self: end;
+    align-self: center;
+    margin: 0;
+
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+    column-gap: 14px;
+    row-gap: 8px;
+    align-items: center;
+    justify-items: center;
+  }
+
+  /* Put buttons on top, counts below */
+  #hagel-btn   { grid-column: 1; grid-row: 1; }
+  #hagel-count { grid-column: 1; grid-row: 2; margin: 0; }
+  #pray-btn    { grid-column: 2; grid-row: 1; }
+  #pray-count  { grid-column: 2; grid-row: 2; margin: 0; }
+
+  /* Slightly reduce FAB size so it fits nicer on phones */
+  .fab {
+    width: 72px;
+    height: 72px;
+  }
+
+  /* Bottom counters: become normal flow and full width */
+  #left-counters {
+    position: static !important;
+    grid-column: 1 / -1;
+    grid-row: 4;
+    width: min(94vw, 560px);
+    margin: 0;
+    padding: 0;
+  }
+
+  .left-counter {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 </style>
 </head>
 
