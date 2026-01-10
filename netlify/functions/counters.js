@@ -86,7 +86,7 @@ exports.handler = async function (event) {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*"
       },
-      body: JSON.stringify({ wins: 0, prayers: 0, hagels: 0, hagelslags: 0 })
+      body: JSON.stringify({ wins: 20, prayers: 1337, hagels: 69, hagelslags: 69 })
     };
   }
 };

@@ -25,7 +25,7 @@ exports.handler = async (event) => {
   const apiKey = process.env.ERATE_API_KEY;
   if (!apiKey) {
     // Return fallback values when API key is not configured
-    cachedData = { startRate: 42.51, currentRate: 43.0392, yesterdayRate: null };
+    cachedData = { startRate: 32.0, currentRate: null, yesterdayRate: null };
     cacheTime = now;
     return {
       statusCode: 200,
