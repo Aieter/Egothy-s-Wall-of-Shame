@@ -610,9 +610,17 @@ function updateExchangeUI(startRate, today, yesterday) {
     }
   }
 
-  setRow(startRate, startRate, arrowStartEl, pctStartEl);
-  setRow(today, startRate, arrowTodayEl, pctTodayEl);
-  setRow(yesterday, startRate, arrowYesterdayEl, pctYesterdayEl);
+ // Keep "Since start" row exactly as-is (will stay 0.00%)
+ setRow(startRate, startRate, arrowStartEl, pctStartEl);
+
+ // Yesterday compared to Start (baseline context)
+ setRow(yesterday, startRate, arrowYesterdayEl, pctYesterdayEl);
+
+ // Today compared to Yesterday (day-over-day)
+ // If yesterday is missing/null, fall back to startRate so it still works on weekends/API gaps.
+ const baseForToday = (yesterday != null && yesterday !== 0) ? yesterday : startRate;
+ setRow(today, baseForToday, arrowTodayEl, pctTodayEl);
+
 
   const inflation = today != null ? ((today - startRate) / startRate) * 100 : null;
   const formatted = inflation != null ? `${Math.abs(inflation).toFixed(2)}%` : '—';
