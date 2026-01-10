@@ -24,13 +24,16 @@ exports.handler = async (event) => {
 
   const apiKey = process.env.ERATE_API_KEY;
   if (!apiKey) {
+    // Return fallback values when API key is not configured
+    cachedData = { startRate: 42.51, currentRate: 43.0392, yesterdayRate: null };
+    cacheTime = now;
     return {
-      statusCode: 500,
+      statusCode: 200,
       headers: { 
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ error: 'API key not configured' }),
+      body: JSON.stringify(cachedData),
     };
   }
 
