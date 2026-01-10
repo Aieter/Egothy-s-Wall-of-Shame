@@ -69,6 +69,138 @@ body {
   text-align: center;
 }
 
+/* ===== Top-left exchange tracker ===== */
+#exchange-tracker {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  min-width: 260px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(6,10,18,0.95), rgba(14,18,28,0.94));
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 40px rgba(2,6,12,0.75), inset 0 0 0 1px rgba(255,255,255,0.02);
+  color: #eaeaf0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+  border-left: 4px solid rgba(109,93,252,0.9);
+}
+
+#exchange-tracker .big {
+  font-weight: 800;
+  font-size: 1.05rem;
+  display:flex; align-items:center; gap:8px;
+}
+
+.rate-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:6px }
+.rate-small { font-size:0.86rem; opacity:0.95 }
+.rate-val { font-variant-numeric: tabular-nums; }
+.rate-arrow { display:inline-block; margin-left:8px; font-size:1rem }
+.arrow-up { color:#3ddc84 }
+.arrow-down { color:#ff6b6b }
+.arrow-flat { color:#c4c4c8 }
+.rate-pct { margin-left:6px; font-size:0.85rem; opacity:0.9 }
+.rate-pct.badge-up{ background: rgba(61,220,132,0.12); color: #14d28f; padding: 3px 7px; border-radius: 999px; font-weight:700; }
+.rate-pct.badge-down{ background: rgba(255,107,107,0.08); color: #ff6b6b; padding: 3px 7px; border-radius: 999px; font-weight:700; }
+.inflation { margin-top:10px; font-weight:800; font-size:0.95rem; }
+/* Align rate rows: fixed right column so values stay in consistent positions */
+.rate-row > .rate-small:last-child {
+  min-width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.rate-val { min-width: 72px; text-align: right; display: inline-block; }
+.rate-pct { min-width: 64px; text-align: right; display: inline-block; }
+.inflation .big-percent {
+  display:inline-block;
+  font-size:1.02rem;
+  font-weight:900;
+  margin-left:8px;
+  vertical-align:middle;
+}
+.inflation .percent-number {
+  display:inline-block;
+  padding: 4px 8px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45), 0 0 18px rgba(0,0,0,0.12) inset;
+  margin-left:6px;
+}
+.inflation.positive .percent-number { color: #ff6b6b; border: 1px solid rgba(255,107,107,0.12); }
+.inflation.negative .percent-number { color: #3ddc84; border: 1px solid rgba(61,220,132,0.08); }
+.inflation .big-percent .arrow { margin-right:6px }
+.inflation .subtext {
+  display:block;
+  font-size:0.82rem;
+  font-weight:600;
+  opacity:0.9;
+  margin-top:6px;
+}
+
+/* ensure big-percent is its own line so percent appears above the subtext */
+
+.big-percent { display:inline-block; margin-top:2px; }
+.inflation.positive .big-percent { color:#ff6b6b }
+.inflation.negative .big-percent { color:#3ddc84 }
+.inflation .arrow { margin-right:6px; font-size:1.1rem }
+
+.stock-badge { font-size:0.9rem; padding:2px 6px; border-radius:10px; background:rgba(255,255,255,0.02); margin-left:6px }
+
+/* richer inflation presentation (tighter layout) */
+.inflation-row { display:flex; align-items:flex-start; gap:8px }
+.inflation-emoji { font-size:0.95rem; display:inline-flex; align-items:center; justify-content:center; opacity:0.85 }
+.big-text { font-size:0.92rem; opacity:0.95; font-weight:700; display:inline-block }
+.percent-number { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace; font-weight:900; display:inline-block; margin-left:6px }
+.inflation.positive .percent-number { color: #ff3b3b }
+.inflation.negative .percent-number { color: #14d28f }
+.inflation .subtext { margin-top:2px; font-size:0.82rem; opacity:0.9; line-height:1.06 }
+
+/* ===== Shrimp Tombstone (top-right) ===== */
+#shrimp-tombstone {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1100;
+  padding: 16px 12px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(255,182,193,0.12), rgba(255,192,203,0.06));
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(255,182,193,0.15), inset 0 0 0 1px rgba(255,255,255,0.08);
+  color: #aaa;
+  text-align: center;
+  max-width: 140px;
+  font-family: 'Georgia', serif;
+}
+
+#shrimp-tombstone .tombstone {
+  font-size: 3rem;
+  margin-bottom: -8px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+#shrimp-tombstone .tombstone-shrimp {
+  font-size: 1.5rem;
+  position: absolute;
+  top: 30px;
+  right: 50%;
+  transform: translateX(50%);
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+#shrimp-tombstone .tombstone-text {
+  font-size: 0.8rem;
+  line-height: 1.3;
+  margin-top: 8px;
+  opacity: 0.9;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
 /* ===== Text ===== */
 h1 {
   margin: 0 0 10px;
@@ -129,7 +261,10 @@ h1 {
   z-index: 999;
 }
 
-#pray-btn {
+#pray-btn, #hagel-btn { }
+
+/* Shared floating-action-button styles */
+.fab {
   width: 74px;
   height: 74px;
   border-radius: 50%;
@@ -145,22 +280,22 @@ h1 {
 
   transition: transform 0.15s ease;
 
-  /* 👇 prevent selection / focus outlines */
+  /* prevent selection / focus outlines */
   user-select: none;
   -webkit-user-select: none;
   outline: none;
 }
 
-#pray-btn:focus,
-#pray-btn:active {
+.fab:focus,
+.fab:active {
   outline: none;
 }
 
-#pray-btn:active {
+.fab:active {
   transform: scale(1.2) rotate(-12deg);
 }
 
-#pray-btn .emoji {
+.fab .emoji {
   display: flex;
   gap: 6px;
   font-size: 28px;
@@ -172,6 +307,14 @@ h1 {
   margin-top: 6px;
   font-size: 0.75rem;
   opacity: 0.6;
+}
+
+#hagel-count {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin-bottom: 8px;
+  text-align: center;
 }
 
 /* ===== Floating Phrase ===== */
@@ -223,7 +366,7 @@ h1 {
     right: 20px;
   }
 
-  #pray-btn {
+  .fab {
     width: 78px;
     height: 78px;
   }
@@ -244,10 +387,109 @@ h1 {
     font-size: 1.9rem;
   }
 }
+
+/* Left-side stacked counters (matey + born) */
+#left-counters {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 999;
+}
+
+.left-counter {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.04);
+  color: #fff;
+  text-align: left;
+  min-width: 160px;
+  cursor: default;
+}
+
+.left-counter .born-num, .left-counter .matey-num {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, var(--gold), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.left-counter .born-label, .left-counter .matey-label {
+  font-size: 0.78rem;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+/* Pirate theme for matey counter */
+#matey-counter {
+  background: linear-gradient(145deg, rgba(30,18,10,0.9), rgba(60,18,6,0.7));
+  box-shadow: 0 6px 18px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,200,80,0.04);
+}
+
+#matey-counter .matey-num {
+  background: linear-gradient(90deg, #ffcc4d, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+#matey-counter { cursor: pointer; }
+
+
+@media (max-width: 600px) {
+  #left-counters { bottom: 18px; left: 18px; }
+  .left-counter .born-num, .left-counter .matey-num { font-size: 1.05rem; }
+}
 </style>
 </head>
 
 <body>
+
+<!-- Exchange tracker (top-left) -->
+<div id="exchange-tracker" aria-live="polite" role="region">
+  <div class="big">📈 Turkish Lira <span class="stock-badge">USD/TRY</span></div>
+  <div class="rate-row">
+    <div class="rate-small">Since start</div>
+    <div id="rate-start" class="rate-small"><span class="rate-val">-</span><span id="arrow-start" class="rate-arrow arrow-flat">➖</span><span id="pct-start" class="rate-pct">-</span></div>
+  </div>
+  <div class="rate-row">
+    <div class="rate-small">Today</div>
+    <div id="rate-today" class="rate-small"><span class="rate-val">-</span><span id="arrow-today" class="rate-arrow arrow-flat">➖</span><span id="pct-today" class="rate-pct">-</span></div>
+  </div>
+  <div class="rate-row">
+    <div class="rate-small">Yesterday</div>
+    <div id="rate-yesterday" class="rate-small"><span class="rate-val">-</span><span id="arrow-yesterday" class="rate-arrow arrow-flat">➖</span><span id="pct-yesterday" class="rate-pct">-</span></div>
+  </div>
+  <div class="inflation" id="rate-inflation">
+    <div class="inflation-row">
+      <div class="inflation-emoji">ℹ️</div>
+      <div>
+        <div>
+          <span class="big-text">Turkish Lira has been inflated by</span>
+          <span class="big-percent"><span class="percent-number">—</span></span>
+        </div>
+        <div class="subtext">since Egg agreed to the contract</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Shrimp Tombstone (top-right) -->
+<div id="shrimp-tombstone">
+  <div class="tombstone">🪦</div>
+  <div class="tombstone-shrimp">🍤</div>
+  <div class="tombstone-text">In rememberance of what could have been.</div>
+</div>
+
+<!-- UFO Video (fullscreen random) -->
+<video id="ufo-video" muted playsinline style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; object-fit: cover; pointer-events: none;">
+  <source src="ufo.webm" type="video/webm">
+</video>
 
 <div class="card">
   <h1>Egothy’s Wall of Shame</h1>
@@ -263,10 +505,28 @@ h1 {
 
 <!-- 😭🙏 Button -->
 <div id="pray-container">
-  <button id="pray-btn">
+  <button id="hagel-btn" class="fab">
+    <span class="emoji">🍫</span>
+  </button>
+  <div id="hagel-count"></div>
+
+  <button id="pray-btn" class="fab">
     <span class="emoji">😭🙏</span>
   </button>
   <div id="pray-count"></div>
+</div>
+
+<!-- Left-side counters: matey (pirate) above, born below -->
+<div id="left-counters">
+  <div id="matey-counter" class="left-counter" aria-live="polite">
+    <div class="matey-num" id="matey-num">0</div>
+    <div class="matey-label">Mateys lost to the sea since Egg agreed to the contract, yarr</div>
+  </div>
+
+  <div id="born-counter" class="left-counter" aria-live="polite">
+    <div class="born-num" id="born-num">0</div>
+    <div class="born-label">Babies born since Egg agreed to the contract</div>
+  </div>
 </div>
 
 <script>
@@ -291,31 +551,115 @@ function playClick() {
 /* ===== Config ===== */
 const total = 20;
 const API = "/.netlify/functions/counters";
+const EXCHANGE_API = "/.netlify/functions/exchange";
 
 /* ===== State ===== */
 let wins = 0;
 let prayers = 0;
+let hagels = 0;
 
 /* ===== Elements ===== */
 const fill = document.getElementById("fill");
 const label = document.getElementById("label");
 const prayCount = document.getElementById("pray-count");
+const hagelCount = document.getElementById("hagel-count");
 const prayBtn = document.getElementById("pray-btn");
+const hagelBtn = document.getElementById("hagel-btn");
+const bornNum = document.getElementById("born-num");
+const mateyNum = document.getElementById("matey-num");
+const rateStartEl = document.getElementById("rate-start");
+const rateTodayEl = document.getElementById("rate-today");
+const rateYesterdayEl = document.getElementById("rate-yesterday");
+const rateInflationEl = document.getElementById("rate-inflation");
+const arrowStartEl = document.getElementById("arrow-start");
+const arrowTodayEl = document.getElementById("arrow-today");
+const arrowYesterdayEl = document.getElementById("arrow-yesterday");
+const pctStartEl = document.getElementById("pct-start");
+const pctTodayEl = document.getElementById("pct-today");
+const pctYesterdayEl = document.getElementById("pct-yesterday");
+const rateValStart = rateStartEl && rateStartEl.querySelector('.rate-val');
+const rateValToday = rateTodayEl && rateTodayEl.querySelector('.rate-val');
+const rateValYesterday = rateYesterdayEl && rateYesterdayEl.querySelector('.rate-val');
+const exchangeTrackerEl = document.getElementById("exchange-tracker");
+
+/* helper to update exchange DOM */
+function updateExchangeUI(startRate, today, yesterday) {
+  if (rateValStart) rateValStart.textContent = `${startRate.toFixed(2)} TRY`;
+  if (rateValToday) rateValToday.textContent = today ? `${today.toFixed(2)} TRY` : '—';
+  if (rateValYesterday) rateValYesterday.textContent = yesterday ? `${yesterday.toFixed(2)} TRY` : '—';
+
+  function setRow(rate, base, arrowEl, pctEl) {
+    if (rate == null) {
+      if (arrowEl) { arrowEl.textContent = '➖'; arrowEl.className = 'rate-arrow arrow-flat'; }
+      if (pctEl) { pctEl.textContent = '-'; pctEl.classList.remove('badge-up','badge-down'); }
+      return;
+    }
+    const pct = ((rate - base) / base) * 100;
+    const sign = pct > 0 ? '+' : pct < 0 ? '' : '';
+    const pctText = `${sign}${pct.toFixed(2)}%`;
+    if (arrowEl) {
+      if (pct > 0) { arrowEl.textContent = '📉'; arrowEl.className = 'rate-arrow arrow-down'; }
+      else if (pct < 0) { arrowEl.textContent = '📈'; arrowEl.className = 'rate-arrow arrow-up'; }
+      else { arrowEl.textContent = '➖'; arrowEl.className = 'rate-arrow arrow-flat'; }
+    }
+    if (pctEl) {
+      pctEl.textContent = pctText;
+      pctEl.classList.remove('badge-up','badge-down');
+      if (pct > 0) pctEl.classList.add('badge-down');
+      else if (pct < 0) pctEl.classList.add('badge-up');
+    }
+  }
+
+  setRow(startRate, startRate, arrowStartEl, pctStartEl);
+  setRow(today, startRate, arrowTodayEl, pctTodayEl);
+  setRow(yesterday, startRate, arrowYesterdayEl, pctYesterdayEl);
+
+  const inflation = today != null ? ((today - startRate) / startRate) * 100 : null;
+  const formatted = inflation != null ? `${Math.abs(inflation).toFixed(2)}%` : '—';
+  const mainEmoji = inflation == null ? 'ℹ️' : inflation > 0 ? '💸' : inflation < 0 ? '🎉' : '➖';
+  rateInflationEl.classList.remove('positive', 'negative');
+  if (inflation > 0) rateInflationEl.classList.add('positive');
+  else if (inflation < 0) rateInflationEl.classList.add('negative');
+
+  rateInflationEl.innerHTML = `
+    <div class="inflation-row">
+      <div class="inflation-emoji">${mainEmoji}</div>
+      <div>
+        <div>
+          <span class="big-text">Turkish Lira has been inflated by</span>
+          <span class="big-percent"><span class="percent-number">${formatted}</span></span>
+        </div>
+        <div class="subtext">since Egg agreed to the contract</div>
+      </div>
+    </div>
+  `;
+
+  if (exchangeTrackerEl) {
+    // pulse removed
+  }
+}
 
 /* ===== Render ===== */
 function render() {
   fill.style.width = `${(wins / total) * 100}%`;
   label.textContent = `${wins} / ${total} wins`;
   prayCount.textContent = `${prayers} prayers sent`;
+  hagelCount.textContent = `${hagels} Hagelslags donated`;
 }
 
 /* ===== Fetch ===== */
 async function fetchCounters() {
-  const res = await fetch(API);
-  const data = await res.json();
-  wins = data.wins;
-  prayers = data.prayers;
-  render();
+  try {
+    const res = await fetch(API);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    wins = data.wins ?? wins;
+    prayers = data.prayers ?? prayers;
+    hagels = data.hagels ?? data.hagelslags ?? hagels;
+    render();
+  } catch (err) {
+    console.warn("fetchCounters failed:", err);
+  }
 }
 
 /* ===== Mutations ===== */
@@ -359,9 +703,195 @@ prayBtn.addEventListener("click", e => {
   sendAction("pray");
 });
 
+hagelBtn.addEventListener("click", e => {
+  playClick();
+
+  const text = document.createElement("div");
+  text.className = "floating-text";
+  text.textContent = "yummy!";
+
+  text.style.left = `${e.clientX - 20}px`;
+  text.style.top = `${e.clientY - 40}px`;
+
+  document.body.appendChild(text);
+  setTimeout(() => text.remove(), 1200);
+
+  sendAction("hagelslag");
+});
+
 /* ===== Init ===== */
 fetchCounters();
 setInterval(fetchCounters, 3000);
+
+/* ===== Exchange tracker ===== */
+async function fetchExchange() {
+  try {
+    const res = await fetch(EXCHANGE_API);
+    const data = await res.json();
+    const startRate = data.startRate ?? 42.51;
+    let today = data.currentRate ?? null;
+    const yesterday = data.yesterdayRate ?? null;
+
+    // Use the API-provided rates (no debug override)
+    updateExchangeUI(startRate, today, yesterday);
+  } catch (err) {
+    console.warn('fetchExchange failed', err);
+    // Fallback preview values when the API is unreachable (e.g., file://)
+    const fallbackStart = 42.51;
+    const fallbackToday = 43.0392; // preview value
+    const fallbackYesterday = null;
+    updateExchangeUI(fallbackStart, fallbackToday, fallbackYesterday);
+  }
+}
+
+// initial fetch and then once per day
+fetchExchange();
+setInterval(fetchExchange, 24 * 60 * 60 * 1000);
+
+/* ===== Babies born counter ===== */
+// Epoch: 2025-12-14 1:00 PM PT (Pacific Time). PT on this date is UTC-8, so convert to UTC.
+const BORN_EPOCH_UTC_MS = Date.UTC(2025, 11, 14, 21, 0, 0);
+const BORN_RATE_PER_SEC = 4.3;
+let lastBornDisplayed = 0;
+
+function getBornCount() {
+  const now = Date.now();
+  const elapsedMs = Math.max(0, now - BORN_EPOCH_UTC_MS);
+  return (elapsedMs * BORN_RATE_PER_SEC) / 1000;
+}
+
+function renderBorn() {
+  const count = getBornCount();
+  // add a small deterministic time-based jitter so the rate doesn't look perfectly linear
+  const now = Date.now();
+
+  // Deterministic value noise + FBM (fractal brownian motion) approach.
+  // This produces non-periodic, natural-looking fluctuations while remaining
+  // deterministic across clients (so everyone sees the same display for a given time).
+
+  // 32-bit integer hash -> uniform 0..1
+  function hash32(u) {
+    u = (u >>> 0);
+    u = (u + 0x7ed55d16 + (u << 12)) >>> 0;
+    u = (u ^ 0xc761c23c) ^ (u >>> 19);
+    u = (u + 0x165667b1 + (u << 5)) >>> 0;
+    u = (u + 0xd3a2646c) ^ (u << 9);
+    u = (u + 0xfd7046c5 + (u << 3)) >>> 0;
+    u = (u ^ 0xb55a4f09) ^ (u >>> 16);
+    return (u >>> 0) / 4294967296;
+  }
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function smoothstep(t) { return t * t * (3 - 2 * t); }
+
+  // value noise: deterministic pseudo-random values at integer time buckets,
+  // smoothly interpolated within each bucket.
+  function valueNoise(timeSeconds, bucketSec, seed) {
+    const idx = Math.floor(timeSeconds / bucketSec);
+    const f = smoothstep((timeSeconds % bucketSec) / bucketSec);
+    const a = hash32(idx + (seed * 2654435761) >>> 0);
+    const b = hash32(idx + 1 + (seed * 2654435761) >>> 0);
+    return lerp(a, b, f);
+  }
+
+  // FBM: sum several octaves of valueNoise with increasing frequency and decreasing amplitude
+  const t = now / 1000; // seconds
+  const baseBucket = 20; // base bucket in seconds
+  let noise = 0;
+  let amp = 1;
+  let freq = 1;
+  for (let o = 0; o < 4; o++) {
+    noise += (valueNoise(t * freq, baseBucket / freq, 17 + o * 31) - 0.5) * amp;
+    amp *= 0.5;
+    freq *= 2;
+  }
+
+  // scale the noise to a reasonable jitter (in units of births)
+  const jitterScale = 6.0; // larger gives more wiggle
+  const jitter = noise * jitterScale;
+
+  // occasional deterministic small spike (rare) to mimic bursts
+  const spikeSeed = Math.floor(t / 3600) + 12345;
+  const spike = (hash32(spikeSeed) > 0.998) ? 3 : 0;
+
+  // compute a displayed integer but never decrease the visible counter
+  const displayValue = Math.max(
+    lastBornDisplayed,
+    Math.floor(count + jitter + spike)
+  );
+  lastBornDisplayed = displayValue;
+  bornNum.textContent = displayValue.toLocaleString();
+}
+
+// Update frequently for smooth increments; keeps synced to epoch because it uses Date.now()
+renderBorn();
+setInterval(renderBorn, 100);
+
+/* ===== Mateys lost to the sea counter (pirate-themed) ===== */
+const MATEY_RATE_PER_SEC = 0.000032;
+
+function getMateyCount() {
+  const now = Date.now();
+  const elapsedMs = Math.max(0, now - BORN_EPOCH_UTC_MS);
+  return (elapsedMs * MATEY_RATE_PER_SEC) / 1000;
+}
+
+function renderMatey() {
+  const count = getMateyCount();
+  const integerCount = Math.floor(count);
+  mateyNum.textContent = integerCount.toLocaleString();
+}
+
+// ahoy sound
+const ahoySound = new Audio("ahoy.mp3");
+ahoySound.volume = 0.6;
+
+// play on click of matey-counter
+const mateyCounterEl = document.getElementById("matey-counter");
+if (mateyCounterEl) {
+  mateyCounterEl.addEventListener("click", () => {
+    try {
+      ahoySound.currentTime = 0;
+      ahoySound.play();
+    } catch (err) {
+      // ignore playback errors
+    }
+  });
+}
+
+renderMatey();
+setInterval(renderMatey, 1000);
+
+// ===== UFO Video Random Playback =====
+(() => {
+  const ufoVideo = document.getElementById('ufo-video');
+  if (!ufoVideo) return;
+
+  function tryPlayUFO() {
+    if (Math.random() < 0.001) { // 1 in 1000 chance
+      ufoVideo.style.display = 'block';
+      ufoVideo.currentTime = 0;
+      ufoVideo.play().catch(err => {
+        console.warn('UFO video play failed:', err);
+        ufoVideo.style.display = 'none';
+      });
+    }
+  }
+
+  // Try to play every second
+  setInterval(tryPlayUFO, 1000);
+
+  // Hide video when it ends
+  ufoVideo.addEventListener('ended', () => {
+    ufoVideo.style.display = 'none';
+  });
+
+  // Hide video on error
+  ufoVideo.addEventListener('error', () => {
+    ufoVideo.style.display = 'none';
+  });
+})();
+
 </script>
 
 </body>

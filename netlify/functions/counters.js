@@ -7,7 +7,8 @@ async function ensureSetup() {
     CREATE TABLE IF NOT EXISTS counters (
       id INTEGER PRIMARY KEY,
       wins INTEGER NOT NULL,
-      prayers INTEGER NOT NULL
+      prayers INTEGER NOT NULL,
+      hagels INTEGER NOT NULL
     )
   `;
 
@@ -15,8 +16,8 @@ async function ensureSetup() {
 
   if (rows.length === 0) {
     await sql`
-      INSERT INTO counters (id, wins, prayers)
-      VALUES (1, 0, 0)
+      INSERT INTO counters (id, wins, prayers, hagels)
+      VALUES (1, 0, 0, 0)
     `;
   }
 }
@@ -29,6 +30,10 @@ exports.handler = async function (event) {
 
     if (action === "pray") {
       await sql`UPDATE counters SET prayers = prayers + 1 WHERE id = 1`;
+    }
+
+    if (action === "hagelslag") {
+      await sql`UPDATE counters SET hagels = hagels + 1 WHERE id = 1`;
     }
 
     if (action === "win") {
@@ -45,7 +50,7 @@ exports.handler = async function (event) {
   }
 
   const [row] = await sql`
-    SELECT wins, prayers FROM counters WHERE id = 1
+    SELECT wins, prayers, hagels FROM counters WHERE id = 1
   `;
 
   return {
@@ -54,6 +59,6 @@ exports.handler = async function (event) {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*"
     },
-    body: JSON.stringify(row)
+    body: JSON.stringify({ ...row, hagelslags: row.hagels })
   };
 };
