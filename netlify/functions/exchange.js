@@ -1,11 +1,38 @@
 // Netlify Function: exchange
 // Returns USD -> TRY current and yesterday rates, plus an optional startRate.
-// If caller provides `?start_date=YYYY-MM-DD` the function will attempt to fetch
-// the historical rate for that date; otherwise a sensible default is returned.
+// Uses exchangerate-api.com with API key for better reliability.
+// Caches results for 1 hour to minimize API calls.
+
+let cachedData = null;
+let cacheTime = 0;
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 
 exports.handler = async (event) => {
-  const base = 'USD';
-  const symbol = 'TRY';
+  const now = Date.now();
+  
+  // Return cached data if it's still fresh
+  if (cachedData && (now - cacheTime) < CACHE_DURATION) {
+    return {
+      statusCode: 200,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify(cachedData),
+    };
+  }
+
+  const apiKey = process.env.ERATE_API_KEY;
+  if (!apiKey) {
+    return {
+      statusCode: 500,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: 'API key not configured' }),
+    };
+  }
 
   // helper: safe fetch supporting environments without global fetch
   async function safeFetch(url) {
@@ -19,43 +46,63 @@ exports.handler = async (event) => {
 
   try {
     // current rate
-    const latestUrl = `https://api.exchangerate.host/latest?base=${base}&symbols=${symbol}`;
+    const latestUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`;
     const latestRes = await safeFetch(latestUrl);
     const latestJson = await latestRes.json();
-    const currentRate = latestJson?.rates?.TRY ?? null;
+    
+    if (latestJson.result !== 'success') {
+      throw new Error(`API Error: ${latestJson['error-type']}`);
+    }
+    
+    const currentRate = latestJson.conversion_rates.TRY;
 
-    // yesterday rate
+    // yesterday rate - use historical endpoint
     const yesterdayDate = new Date(Date.now() - 24 * 60 * 60 * 1000)
       .toISOString()
       .slice(0, 10);
-    const yesterdayUrl = `https://api.exchangerate.host/${yesterdayDate}?base=${base}&symbols=${symbol}`;
+    const yesterdayUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/history/USD/${yesterdayDate}`;
     const yRes = await safeFetch(yesterdayUrl);
     const yJson = await yRes.json();
-    const yesterdayRate = yJson?.rates?.TRY ?? null;
+    
+    let yesterdayRate = null;
+    if (yJson.result === 'success') {
+      yesterdayRate = yJson.conversion_rates.TRY;
+    }
 
     // startRate: try query param `start_date=YYYY-MM-DD`, otherwise default
     let startRate = 42.51;
     const params = event.queryStringParameters || {};
     if (params.start_date) {
       try {
-        const sUrl = `https://api.exchangerate.host/${params.start_date}?base=${base}&symbols=${symbol}`;
+        const sUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/history/USD/${params.start_date}`;
         const sRes = await safeFetch(sUrl);
         const sJson = await sRes.json();
-        if (sJson?.rates?.TRY) startRate = sJson.rates.TRY;
+        if (sJson.result === 'success' && sJson.conversion_rates.TRY) {
+          startRate = sJson.conversion_rates.TRY;
+        }
       } catch (e) {
         // ignore and fall back to default
       }
     }
 
+    cachedData = { startRate, currentRate, yesterdayRate };
+    cacheTime = now;
+
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ startRate, currentRate, yesterdayRate }),
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify(cachedData),
     };
   } catch (err) {
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({ error: String(err) }),
     };
   }

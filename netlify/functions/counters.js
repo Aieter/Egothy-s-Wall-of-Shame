@@ -1,6 +1,6 @@
 const { neon } = require("@netlify/neon");
 
-const sql = neon();
+const sql = neon(process.env.DATABASE_URL);
 
 async function ensureSetup() {
   await sql`
